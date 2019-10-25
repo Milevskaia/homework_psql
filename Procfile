@@ -1,2 +1,2 @@
-web: python dao/orm/populate.py; gunicorn:app
+web: gunicorn app:app
 
