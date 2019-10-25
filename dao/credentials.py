@@ -1,0 +1,5 @@
+username = 'developer'
+password = 'developer'
+database_name = 'develop_db'
+host = 'localhost'
+port = '5432'
