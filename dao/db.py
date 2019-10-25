@@ -13,7 +13,13 @@ class PostgresDB(object):
             cls._instance = object.__new__(cls)
             try:
                 # connection = psycopg2.connect(username, password, "{0}:{1}/{2}".format(host, port, database_name))
-                connection = psycopg2.connect(dbname=database_name, user=username, password=password)
+                connection = psycopg2.connect(
+                    dbname=database_name,
+                    user=username,
+                    password=password,
+                    host=host,
+                    port=port
+                )
                 cursor = connection.cursor()
 
                 cursor.execute('SELECT version();')
