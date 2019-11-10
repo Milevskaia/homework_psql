@@ -3,10 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf import CSRFProtect
 
 from forms.forms import TestForm, QuestionForm, QuestionVariantForm
-from forms.search_form import SearchForm
 from dao.orm.model import *
 from dao.db import PostgresDB
-# from forms.forms import OwnerForm
 from sqlalchemy.sql import func
 
 import plotly
@@ -172,17 +170,20 @@ def dashboard():
         y=question_counts
     )
 
-    cars, owner_count = zip(*query2)
+    tests, question_count = zip(*query2)
     pie = go.Pie(
-        labels=cars,
-        values=owner_count
+        labels=tests,
+        values=question_count
     )
 
     data = {
         "bar":[bar],
         "pie":[pie]
     }
-    graphsJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    graphsJSON = json.dumps(
+        data,
+        cls=plotly.utils.PlotlyJSONEncoder
+    )
 
     return render_template('dashboard.html', graphsJSON=graphsJSON)
 

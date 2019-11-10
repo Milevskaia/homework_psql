@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, IntegerField, BooleanField
+from wtforms import StringField, SubmitField, IntegerField
 from wtforms import validators
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from dao.db import PostgresDB
 from dao.orm.model import ormTest, ormQuestion
