@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf import CSRFProtect
 
-from forms.forms import TestForm, QuestionForm, QuestionVariantForm
+from forms.forms import TestForm, QuestionForm, QuestionVariantForm, TagForm
 from dao.orm.model import *
 from dao.db import PostgresDB
 from sqlalchemy.sql import func
@@ -164,6 +164,11 @@ def dashboard():
         func.count(ormQuestion.question_id).label('question_count')
     ).outerjoin(ormQuestion).group_by(ormTest.test_name).all()
 
+    query3 = db.sqlalchemy_session.query(
+        ormTag.tag_category,
+        func.count(ormTag.count_of_likes).label('likes_amount')
+    ).outerjoin(ormQuestion).group_by(ormTag.tag_category).all()
+
     variants, question_counts = zip(*query1)
     bar = go.Bar(
         x=variants,
@@ -176,8 +181,13 @@ def dashboard():
         values=question_count
     )
 
+    category, likes_amount = zip(*query3)
+    bar_second = go.Bar(
+        x=category,
+        y=likes_amount
+)
     data = {
-        "bar":[bar],
+        "bar":[bar,bar_second],
         "pie":[pie]
     }
     graphsJSON = json.dumps(
@@ -187,6 +197,47 @@ def dashboard():
 
     return render_template('dashboard.html', graphsJSON=graphsJSON)
 
+
+@app.route('/get', methods=['GET', ])
+def get():
+    db.sqlalchemy_session.query(ormTag).insert(
+        tag_name='first',
+        tag_category ='asfas',
+        count_of_likes=10,
+        count_of_dislikes=2,
+        question_id=1
+    )
+    db.sqlalchemy_session.query(ormTag).insert(
+        tag_name='second',
+        tag_category ='pofjf',
+        count_of_likes=20,
+        count_of_dislikes=4,
+        question_id=2
+    )
+    db.sqlalchemy_session.query(ormTag).insert(
+        tag_name='third',
+        tag_category ='wgdhjf',
+        count_of_likes=15,
+        count_of_dislikes=5,
+        question_id=3
+    )
+    db.sqlalchemy_session.commit()
+    return 'Created', 201
+
+@app.route('/show', methods=['GET', ])
+def show():
+    result = db.sqlalchemy_session.query(ormTag).all()
+    return render_template('tag.html', tags=result)
+
+@app.route('/update', methods=['POST', ])
+def update():
+    data = request.form
+    form = TagForm(data)
+    if not form.validate():
+        return render_template('tag.html', errors=form.errors)
+    db.sqlalchemy_session.add(ormTag(tag_category=data.get('tag_category'), count_of_likes=int(data.get('count_of_likes'))))
+    db.sqlalchemy_engine.commit()
+    return render_template('tag.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
