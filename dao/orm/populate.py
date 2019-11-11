@@ -11,6 +11,7 @@ session = db.sqlalchemy_session
 session.query(ormQuestionVariant).delete()
 session.query(ormQuestion).delete()
 session.query(ormTest).delete()
+session.query(ormTag).delete()
 
 test_1_v_1 = ormTest(
     # test_id=1,
@@ -102,9 +103,37 @@ test_1_v_1_question_2_variant_2 = ormQuestionVariant(
     answer_check=True
 )
 
+category_1 = ormTag(
+    tag_category ='lol',
+    count_of_likes=40
+)
+
+category_2 = ormTag(
+    tag_category ='olol',
+    count_of_likes=20
+
+)
+
+category_3 = ormTag(
+    tag_category ='plol',
+    count_of_likes=30
+)
+
+category_4 = ormTag(
+    tag_category ='klol',
+    count_of_likes=10
+
+)
+
+session.add_all([
+    category_1, category_2, category_3, category_4
+])
+session.commit()
+
 session.add_all([
     test_1_v_1_question_1_variant_1, test_1_v_1_question_1_variant_2, test_1_v_1_question_1_variant_3,
-    test_1_v_1_question_2_variant_1, test_1_v_1_question_2_variant_2
+    test_1_v_1_question_2_variant_1, test_1_v_1_question_2_variant_2,
+    category_1, category_2, category_3, category_4
 ])
 
 session.commit()

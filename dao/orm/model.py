@@ -31,7 +31,7 @@ class ormQuestion(Base):
     test_id = Column(Integer, ForeignKey('orm_test.test_id'))
 
     question_variants = relationship('ormQuestionVariant', cascade="all,delete")
-
+    question_tags = relationship('ormTag', cascade="all,delete")
 
 class ormQuestionVariant(Base):
     __tablename__ = 'orm_question_variant'
@@ -41,4 +41,13 @@ class ormQuestionVariant(Base):
     answer_check = Column(Boolean, default=False, nullable=False)
     question_id = Column(Integer, ForeignKey('orm_question.question_id', ondelete='CASCADE'))
 
+class ormTag(Base):
+    __tablename__ = 'orm_tag'
+
+    tag_id = Column(Integer, primary_key=True, autoincrement=True)
+    tag_name = Column(String(63), nullable=True)
+    tag_category = Column(String(63), nullable=True)
+    count_of_likes = Column(Integer, nullable=True)
+    count_of_dislikes = Column(Integer, nullable=True)
+    question_id = Column(Integer, ForeignKey('orm_question.question_id', ondelete='CASCADE'))
 

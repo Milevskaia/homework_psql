@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms import validators
+from wtforms.validators import AnyOf
 
 from dao.db import PostgresDB
 from dao.orm.model import ormTest, ormQuestion
@@ -31,3 +32,8 @@ class QuestionForm(FlaskForm):
 class QuestionVariantForm(FlaskForm):
     answer_variant_text = StringField("Name: ", [validators.DataRequired(), validators.Length(max=511)])
     question_id = IntegerField()
+
+class TagForm(FlaskForm):
+    tag_category = StringField("Category: ", [validators.AnyOf(values=['news','sport'])])
+    count_of_likes = IntegerField("Amount: ",[validators.NumberRange(min=0)])
+    submit = SubmitField("Save")
