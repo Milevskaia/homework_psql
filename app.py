@@ -153,6 +153,8 @@ def delete_question_variants(id):
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
+    pies = []
+    bars = []
     query1 = db.sqlalchemy_session.query(
         ormTest.test_name,
         func.count(ormTest.test_variant).label('test_variants_count')).group_by(
@@ -174,21 +176,24 @@ def dashboard():
         x=variants,
         y=question_counts
     )
+    bars.append(bar)
 
     tests, question_count = zip(*query2)
     pie = go.Pie(
         labels=tests,
         values=question_count
     )
-
-    category, likes_amount = zip(*query3)
-    bar_second = go.Bar(
-        x=category,
-        y=likes_amount
-)
+    pies.append(pie)
+    if query3:
+        category, likes_amount = zip(*query3)
+        bar_second = go.Bar(
+            x=category,
+            y=likes_amount
+        )
+        bars.append(bar_second)
     data = {
-        "bar":[bar,bar_second],
-        "pie":[pie]
+        "bar": bars,
+        "pie": pies
     }
     graphsJSON = json.dumps(
         data,
@@ -200,34 +205,40 @@ def dashboard():
 
 @app.route('/get', methods=['GET', ])
 def get():
-    db.sqlalchemy_session.query(ormTag).insert(
-        tag_name='first',
-        tag_category ='asfas',
-        count_of_likes=10,
-        count_of_dislikes=2,
-        question_id=1
-    )
-    db.sqlalchemy_session.query(ormTag).insert(
-        tag_name='second',
-        tag_category ='pofjf',
-        count_of_likes=20,
-        count_of_dislikes=4,
-        question_id=2
-    )
-    db.sqlalchemy_session.query(ormTag).insert(
-        tag_name='third',
-        tag_category ='wgdhjf',
-        count_of_likes=15,
-        count_of_dislikes=5,
-        question_id=3
-    )
-    db.sqlalchemy_session.commit()
+    question = db.sqlalchemy_session.query(ormQuestion).first()
+    try:
+        ormTag.insert(
+            tag_name='first',
+            tag_category ='asfas',
+            count_of_likes=10,
+            count_of_dislikes=2,
+            question_id=question.question_id
+        )
+        ormTag.insert(
+            tag_name='second',
+            tag_category ='pofjf',
+            count_of_likes=20,
+            count_of_dislikes=4,
+            question_id=question.question_id
+        )
+        ormTag.insert(
+            tag_name='third',
+            tag_category ='wgdhjf',
+            count_of_likes=15,
+            count_of_dislikes=5,
+            question_id=question.question_id
+        )
+        db.sqlalchemy_session.commit()
+    except:
+        pass
     return 'Created', 201
+
 
 @app.route('/show', methods=['GET', ])
 def show():
     result = db.sqlalchemy_session.query(ormTag).all()
     return render_template('tag.html', tags=result)
+
 
 @app.route('/update', methods=['POST', ])
 def update():
@@ -238,6 +249,7 @@ def update():
     db.sqlalchemy_session.add(ormTag(tag_category=data.get('tag_category'), count_of_likes=int(data.get('count_of_likes'))))
     db.sqlalchemy_engine.commit()
     return render_template('tag.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

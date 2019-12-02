@@ -2,6 +2,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, UniqueConstraint, Boolean
 from sqlalchemy.orm import relationship, backref
 
+from dao.db import PostgresDB
+
+db = PostgresDB()
+
 Base = declarative_base()
 
 
@@ -51,3 +55,9 @@ class ormTag(Base):
     count_of_dislikes = Column(Integer, nullable=True)
     question_id = Column(Integer, ForeignKey('orm_question.question_id', ondelete='CASCADE'))
 
+    @classmethod
+    def insert(cls, **data):
+        instance = cls(**data)
+        db.sqlalchemy_session.add(instance)
+        db.sqlalchemy_session.commit()
+        return instance
